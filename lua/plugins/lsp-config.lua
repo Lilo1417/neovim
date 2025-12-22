@@ -1,37 +1,79 @@
 return {
-    {
-        "mason-org/mason.nvim",
-        config=function()
-            require("mason").setup()
-        end
+  {
+    "mason-org/mason.nvim",
+    config = function()
+      require("mason").setup()
+    end,
+  },
+
+  {
+    "mason-org/mason-lspconfig.nvim",
+    opts = {
+      ensure_installed = {
+        "lua_ls",
+        "bashls",
+        "hyprls",
+        "pyright",
+        "cssls",
+        "cmake",
+      },
     },
-    {
-        "mason-org/mason-lspconfig.nvim",
-        opts = {},
-        config = function()
-            require("mason-lspconfig").setup({
-                ensure_installed = { "lua_ls",
-                --"asm_lsp",
-                "bashls",
-                "hyprls",
-                --"bsql",
-                --"clanged",
-                "pyright",
-                "cssls",
-                "cmake",
-                --"atotools_ls",
-            }
-            })
-        end
-    },
-    {
-        "neovim/nvim-lspconfig",
-        config = function()
-            local keymap = vim.keymap
-            vim.lsp.enable({'bashls', 'hyprls', 'pyright', 'cssls', 'cmake'})
-            keymap.set('n', '<leader>ki', vim.lsp.buf.hover, {})
-            keymap.set("n", "<leader>gd", vim.lsp.buf.definition, {})
-            keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, {})
-        end
-    }
+  },
+
+  {
+    "neovim/nvim-lspconfig",
+    config = function()
+      local capabilities =
+        require("cmp_nvim_lsp").default_capabilities()
+
+      -- Define servers (NO lspconfig)
+      vim.lsp.config("lua_ls", {
+        capabilities = capabilities,
+        settings = {
+          Lua = {
+            diagnostics = {
+              globals = { "vim" },
+            },
+          },
+        },
+      })
+
+      vim.lsp.config("bashls", {
+        capabilities = capabilities,
+      })
+
+      vim.lsp.config("hyprls", {
+        capabilities = capabilities,
+      })
+
+      vim.lsp.config("pyright", {
+        capabilities = capabilities,
+      })
+
+      vim.lsp.config("cssls", {
+        capabilities = capabilities,
+      })
+
+      vim.lsp.config("cmake", {
+        capabilities = capabilities,
+      })
+
+      -- Enable servers
+      vim.lsp.enable({
+        "lua_ls",
+        "bashls",
+        "hyprls",
+        "pyright",
+        "cssls",
+        "cmake",
+      })
+
+      -- Keymaps
+      local keymap = vim.keymap
+      keymap.set("n", "<leader>ki", vim.lsp.buf.hover)
+      keymap.set("n", "<leader>gd", vim.lsp.buf.definition)
+      keymap.set("n", "<leader>ca", vim.lsp.buf.code_action)
+    end,
+  },
 }
+
