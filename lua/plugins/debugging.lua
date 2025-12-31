@@ -8,83 +8,65 @@ return {
             "jay-babu/mason-nvim-dap.nvim",
             "theHamsta/nvim-dap-virtual-text",
         },
-        config = function ()
-            local mason_dap = require("mason-nvim-dap")
+        config = function()
             local dap = require("dap")
+            local mason_dap = require("mason-nvim-dap")
             local ui = require("dapui")
             local dap_virtual_text = require("nvim-dap-virtual-text")
 
+            -- Virtual text
             dap_virtual_text.setup()
 
+            -- Mason DAP setup
             mason_dap.setup({
-                ensure_installed = {"cppdbg"},
+                ensure_installed = {"cppdbg", "codelldb"},
                 automatic_installation = true,
                 handlers = {
-                    function (config)
-                        require("mason-nvim-dap").default_setup(config)
+                    function(config)
+                        mason_dap.default_setup(config)
                     end,
                 },
             })
+
+            -- Configurations for C, C++, Rust
+            local function get_program_path()
+                return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+            end
+
+            -- C, C++, Rust
             dap.configurations.c = {
                 {
-                    name = "Launch",
-                    type = "gdb",
+                    name = "Launch file (cpplldb)",
+                    type = "codelldb",   -- adapter name
                     request = "launch",
-                    program = function()
-                      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
-                    end,
-                    args = {}, -- provide arguments if needed
+                    program = get_program_path,
                     cwd = "${workspaceFolder}",
-                    stopAtBeginningOfMainSubprogram = false,
-                  },
-                  {
-                    name = "Select and attach to process",
-                    type = "gdb",
-                    request = "attach",
-                    program = function()
-                      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
-                    end,
-                    pid = function()
-                      local name = vim.fn.input('Executable name (filter): ')
-                      return require("dap.utils").pick_process({ filter = name })
-                    end,
-                    cwd = '${workspaceFolder}'
-                  },
-                  {
-                    name = 'Attach to gdbserver :1234',
-                    type = 'gdb',
-                    request = 'attach',
-                    target = 'localhost:1234',
-                    program = function()
-                      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
-                    end,
-                    cwd = '${workspaceFolder}'
-                  }
-              }
-              dap.configurations.cpp = dap.configurations.c
-              dap.configurations.rust = dap.configurations.c
+                    stopOnEntry = false,
+                },
+            }
 
+            dap.configurations.cpp = dap.configurations.c
+            dap.configurations.rust = dap.configurations.c
+            -- DAP UI
+            ui.setup()
 
-        -- Dap UI
+            vim.fn.sign_define("DapBreakpoint", { text = "" })
 
-        ui.setup()
+            dap.listeners.before.attach.dapui_config = function()
+                ui.open()
+            end
+            dap.listeners.before.launch.dapui_config = function()
+                ui.open()
+            end
+            dap.listeners.before.event_terminated.dapui_config = function()
+                ui.close()
+            end
+            dap.listeners.before.event_exited.dapui_config = function()
+                ui.close()
+            end
 
-        vim.fn.sign_define("DapBreakpoint", { text = "" })
-
-        dap.listeners.before.attach.dapui_config = function()
-            ui.open()
-        end
-        dap.listeners.before.launch.dapui_config = function()
-            ui.open()
-        end
-        dap.listeners.before.event_terminated.dapui_config = function()
-            ui.close()
-        end
-        dap.listeners.before.event_exited.dapui_config = function()
-            ui.close()
-        end
-
-        require("which-key").add({
+            -- Keybindings
+            require("which-key").add({
           -- Debugger
           {
               "<leader>d",
@@ -185,9 +167,7 @@ return {
               remap = false,
           },
         }, { mode = "n" })
-
-
-        end
+    end,
     },
 }
 

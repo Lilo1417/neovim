@@ -16,6 +16,9 @@ return {
         "pyright",
         "cssls",
         "cmake",
+        "clangd",
+        "codelldb",
+        "clang_format",
       },
     },
   },
@@ -56,6 +59,9 @@ return {
 
       vim.lsp.config("cmake", {
         capabilities = capabilities,
+      })
+      vim.lsp.config("clangd", {
+        capabilities = capabilities
       })
 
       -- Enable servers
