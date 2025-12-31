@@ -1,87 +1,89 @@
 return {
     {
-        "rcarriga/nvim-dap-ui",
-        dependencies = {
-            "mfussenegger/nvim-dap",
-            "nvim-neotest/nvim-nio",
-        },
-    },
-    {
         "mfussenegger/nvim-dap",
-        config = function()
+        event = "VeryLazy",
+        dependencies = {
+            "rcarriga/nvim-dap-ui",
+            "nvim-neotest/nvim-nio",
+            "jay-babu/mason-nvim-dap.nvim",
+            "theHamsta/nvim-dap-virtual-text",
+        },
+        config = function ()
+            local mason_dap = require("mason-nvim-dap")
             local dap = require("dap")
-            local dapui = require("dapui")
+            local ui = require("dapui")
+            local dap_virtual_text = require("nvim-dap-virtual-text")
 
-            -- Setup DAP UI
-            dapui.setup()
+            dap_virtual_text.setup()
 
-            -- Listeners
-            dap.listeners.after.event_initialized["dapui_config"] = function()
-                dapui.open()
-            end
-            dap.listeners.before.event_terminated["dapui_config"] = function()
-                dapui.close()
-            end
-            dap.listeners.before.event_exited["dapui_config"] = function()
-                dapui.close()
-            end
+            mason_dap.setup({
+                ensure_installed = {"cppdbg"},
+                automatic_installation = true,
+                handlers = {
+                    function (config)
+                        require("mason-nvim-dap").default_setup(config)
+                    end,
+                },
+            })
+            dap.configurations.c = {
+                {
+                    name = "Launch",
+                    type = "gdb",
+                    request = "launch",
+                    program = function()
+                      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+                    end,
+                    args = {}, -- provide arguments if needed
+                    cwd = "${workspaceFolder}",
+                    stopAtBeginningOfMainSubprogram = false,
+                  },
+                  {
+                    name = "Select and attach to process",
+                    type = "gdb",
+                    request = "attach",
+                    program = function()
+                      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+                    end,
+                    pid = function()
+                      local name = vim.fn.input('Executable name (filter): ')
+                      return require("dap.utils").pick_process({ filter = name })
+                    end,
+                    cwd = '${workspaceFolder}'
+                  },
+                  {
+                    name = 'Attach to gdbserver :1234',
+                    type = 'gdb',
+                    request = 'attach',
+                    target = 'localhost:1234',
+                    program = function()
+                      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+                    end,
+                    cwd = '${workspaceFolder}'
+                  }
+              }
+              dap.configurations.cpp = dap.configurations.c
+              dap.configurations.rust = dap.configurations.c
 
-            -- Keymaps
-            local keymap = vim.keymap
-            keymap.set("n", "<Leader>db", dap.toggle_breakpoint)
-            keymap.set("n", "<Leader>dc", dap.continue)
-            keymap.set("n", "<Leader>do", dap.step_over)
-            keymap.set("n", "<Leader>di", dap.step_into)
-            keymap.set("n", "<Leader>de", dap.step_out)
-            keymap.set("n", "<Leader>dr", dap.repl.open)
 
-            -- Adapter for GDB
-            dap.adapters.cppdbg = {
-                type = "executable",
-                command = "gdb",
-                args = { "--interpreter=mi2" },
-            }
+        -- Dap UI
 
-            -- Configurations
-            local function make_c_cpp_config(name)
-                return {
-                    {
-                        name = "Launch " .. name,
-                        type = "cppdbg",
-                        request = "launch",
-                        program = function()
-                            return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
-                        end,
-                        args = {},
-                        cwd = "${workspaceFolder}",
-                        stopAtEntry = false,
-                        setupCommands = {
-                            {
-                                text = "-enable-pretty-printing",
-                                description = "enable pretty printing",
-                                ignoreFailures = false,
-                            },
-                        },
-                    },
-                    {
-                        name = "Attach to process " .. name,
-                        type = "cppdbg",
-                        request = "attach",
-                        program = function()
-                            return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
-                        end,
-                        pid = function()
-                            return require("dap.utils").pick_process()
-                        end,
-                        cwd = "${workspaceFolder}",
-                    },
-                }
-            end
+        ui.setup()
 
-            dap.configurations.c = make_c_cpp_config("C")
-            dap.configurations.cpp = make_c_cpp_config("C++")
-            dap.configurations.rust = make_c_cpp_config("Rust")
-        end,
+        vim.fn.sign_define("DapBreakpoint", { text = "🐞" })
+
+        dap.listeners.before.attach.dapui_config = function()
+            ui.open()
+        end
+        dap.listeners.before.launch.dapui_config = function()
+            ui.open()
+        end
+        dap.listeners.before.event_terminated.dapui_config = function()
+            ui.close()
+        end
+        dap.listeners.before.event_exited.dapui_config = function()
+            ui.close()
+        end
+        end
     },
 }
 
