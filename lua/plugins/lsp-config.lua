@@ -28,6 +28,14 @@ return {
     config = function()
       local capabilities =
         require("cmp_nvim_lsp").default_capabilities()
+        vim.diagnostic.config({
+            virtual_text = true,   -- show message inline
+            signs = true,          -- show symbols in the gutter
+            underline = true,      -- underline problematic code
+            update_in_insert = false,
+            severity_sort = true,
+        })
+
 
       -- Define servers (NO lspconfig)
       vim.lsp.config("lua_ls", {
