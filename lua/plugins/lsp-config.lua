@@ -15,7 +15,7 @@ return {
 				"hyprls",
 				"pyright",
 				"cssls",
-				"cmake",
+				-- "cmake",
 				"clangd",
 				"codelldb",
 				"clang_format",
@@ -63,9 +63,9 @@ return {
 				capabilities = capabilities,
 			})
 
-			vim.lsp.config("cmake", {
-				capabilities = capabilities,
-			})
+			-- vim.lsp.config("cmake", {
+			-- 	capabilities = capabilities,
+			-- })
 			vim.lsp.config("clangd", {
 				cmd = { "clangd", "--query-driver=/usr/bin/clang++,/usr/bin/g++" },
 				capabilities = capabilities,
