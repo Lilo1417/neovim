@@ -7,6 +7,7 @@ return {
             "nvim-neotest/nvim-nio",
             "jay-babu/mason-nvim-dap.nvim",
             "theHamsta/nvim-dap-virtual-text",
+            "mfussenegger/nvim-dap-python",
         },
         config = function()
             local dap = require("dap")
@@ -47,6 +48,9 @@ return {
 
             dap.configurations.cpp = dap.configurations.c
             dap.configurations.rust = dap.configurations.c
+
+            --Python
+            require("dap-python").setup("python3")
             -- DAP UI
             ui.setup()
 
