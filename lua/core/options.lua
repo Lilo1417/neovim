@@ -4,3 +4,4 @@ vim.cmd("set expandtab")
 vim.cmd("set softtabstop=4")
 vim.opt.number = true
 vim.opt.relativenumber = true
+
