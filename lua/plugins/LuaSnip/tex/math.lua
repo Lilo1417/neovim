@@ -37,7 +37,7 @@ s({trig="eq", dscr="Expands 'eq' into an equation environment"},
   )
 ),
 -- Code for environment snippet in the above GIF
-s({trig = "mm", wordTrig = false, regTrig = true, snippetType="autosnippet"},
+s({trig = "mm", snippetType="autosnippet"},
   fmta(
     "<>$<>$",
     {

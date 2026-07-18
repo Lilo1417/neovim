@@ -57,7 +57,7 @@ s({trig="cc", snippetType="autosnippet"},
     }
   )
 ),
-s({trig="ss", snippetType="autosnippet"},
+s({trig="ss", wordTrig=true, snippetType="autosnippet"},
   fmta(
     [[
       \section{<>}
@@ -67,7 +67,13 @@ s({trig="ss", snippetType="autosnippet"},
       i(1),
       i(2),
     }
-  )
+  ),
+    {
+    condition = function(line_to_cursor)
+      local before = line_to_cursor:sub(-3, -3)
+      return before == "" or not before:match("[%a]")
+    end
+  }
 ),
 s({trig="ubss", snippetType="autosnippet"},
   fmta(
@@ -93,7 +99,7 @@ s({trig="bubs", snippetType="autosnippet"},
     }
   )
 ),
-s({trig="ll", snippetType="autosnippet"},
+s({trig="lbl", snippetType="autosnippet"},
     fmta(
         "\\label{<>}",
         { i(0) }
