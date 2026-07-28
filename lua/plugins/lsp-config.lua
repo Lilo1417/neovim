@@ -15,7 +15,7 @@ return {
 				"hyprls",
 				"pyright",
 				"cssls",
-				-- "cmake",
+                "qmlls",
 				"clangd",
 				"codelldb",
 				"clang_format",
@@ -50,6 +50,11 @@ return {
 			vim.lsp.config("bashls", {
 				capabilities = capabilities,
 			})
+
+            vim.lsp.config("qmlls", {
+              cmd = {"qmlls"},
+              capabilities = capabilities,
+            })
 
 			vim.lsp.config("hyprls", {
 				capabilities = capabilities,
