@@ -52,8 +52,7 @@ return {
 			})
 
             vim.lsp.config("qmlls", {
-              cmd = {"qmlls"},
-              capabilities = capabilities,
+              cmd = {"qmlls6"},
             })
 
 			vim.lsp.config("hyprls", {
